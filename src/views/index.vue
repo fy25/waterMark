@@ -1,5 +1,5 @@
 <template>
-    <div class="index">
+    <div class="index" ref="index">
         <!-- 导航栏 -->
         <div class="nav">
             <div class="nav-list">
@@ -10,7 +10,12 @@
         </div>
         <!-- 照片列表 -->
         <div class="photo">
-            <vue-waterfall-easy :imgsArr="imgsArr" @scrollLoadImg="fetchImgsData"></vue-waterfall-easy>
+            <div class="box" v-for="(item,index) in imageList" :key="index" ref="box">
+              <div class="pic">
+                <img :src="item.src" alt="">
+              </div>
+            </div>
+            
         </div>
     </div>
 </template>
@@ -23,7 +28,10 @@
   flex-direction: row;
   .nav {
     width: 30%;
-    position: relative;
+    position: fixed;
+    left: 0;
+    top: 0;
+    min-height: 100vh;
     .nav-list {
       background-color: #fff;
       position: absolute;
@@ -49,8 +57,24 @@
   .photo {
     width: 70%;
     background-color: #fff;
-    img {
-      width: 100%;
+    position: fixed;
+    right: 0;
+    top: 0;
+    min-height: 100vh;
+    overflow-y: scroll;
+    .box {
+      padding: 0.15rem;
+      float: left;
+      .pic {
+        padding: 0.15rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 0 5px #ccc;
+        img {
+          width: 3rem;
+          height: auto;
+        }
+      }
     }
   }
 }
@@ -63,7 +87,7 @@ import WaterfallSlot from "vue-waterfall/lib/waterfall-slot";
 import vueWaterfallEasy from "vue-waterfall-easy";
 
 export default {
-  data() {
+  data () {
     return {
       tabList: [
         {
@@ -87,36 +111,51 @@ export default {
           type: "4"
         }
       ],
-      imgsArr: [
+      imageList: [
         {
-          src: "http://p0rz0hmjn.bkt.clouddn.com/about_02.jpg",
-          link: "",
-          info: "一些图片描述文字"
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/about_02.jpg'
         },
         {
-          src: "http://p0rz0hmjn.bkt.clouddn.com/xyhbban1.jpg",
-          link: "",
-          info: "一些图片描述文字"
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/avatar.jpg'
         },
         {
-          src: "http://p0rz0hmjn.bkt.clouddn.com/about_02.jpg",
-          link: "",
-          info: "一些图片描述文字"
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/banner_02.jpg'
         },
         {
-          src: "http://p0rz0hmjn.bkt.clouddn.com/xyhbban1.jpg",
-          link: "",
-          info: "一些图片描述文字"
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/card_lock.png'
         },
         {
-          src: "http://p0rz0hmjn.bkt.clouddn.com/about_02.jpg",
-          link: "",
-          info: "一些图片描述文字"
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/conclusionabout_01.jpg'
         },
         {
-          src: "http://p0rz0hmjn.bkt.clouddn.com/xyhbban1.jpg",
-          link: "",
-          info: "一些图片描述文字"
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/fengyu.jpg'
+        },
+        {
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/lyyybg.jpg'
+        },
+        {
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/person.jpg'
+        },
+        {
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/personal_bg.jpg'
+        },
+        {
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/conclusionabout_01.jpg'
+        },
+        {
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/fengyu.jpg'
+        },
+        {
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/lyyybg.jpg'
+        },
+        {
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/person.jpg'
+        },
+        {
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/personal_bg.jpg'
+        },
+        {
+          src: 'http://p0rz0hmjn.bkt.clouddn.com/xyhbban3.jpg'
         }
       ],
       fetchImgsArr: [],
@@ -128,34 +167,52 @@ export default {
     WaterfallSlot,
     vueWaterfallEasy
   },
-  mounted() {},
   methods: {
-    initImgsArr(n, m) {
-      //初始化图片数组的方法，把要加载的图片装入
-      var arr = [];
-      for (var i = n; i < m; i++) {
-        arr.push({
-          src: "http://p0rz0hmjn.bkt.clouddn.com/about_02.jpg",
-          link: "",
-          info: "一些图片描述文字"
-        }); //src为加载的图片的地址、link为超链接的链接地址、 //info为自定义的图片展示信息，请根据自己的情况自行填写
-      }
-      return arr;
-    },
-
-    fetchImgsData() {
-      //获取新的图片数据的方法，用于页面滚动满足条件时调用
-      this.imgsArr = this.imgsArr.concat(this.fetchImgsArr); //数组拼接，把下一批要加载的图片放入所有图片的数组中
-    },
-
     // tab切换
-    tabTap(type, index) {
+    tabTap (type, index) {
       this.curNum = index;
+    },
+
+    initImg () {
+      let boxs = this.$refs.box;
+      console.log(boxs.length)
+
+      // 计算整个页面显示的列数
+      let boxW = boxs[0].offsetWidth;
+      let windowW = this.$refs.index.offsetWidth * 0.7;
+      let cols = Math.floor(windowW / boxW)
+      console.log(cols)
+      let hArr = [];
+      for (let i = 0; i < boxs.length; i++) {
+        if (i < cols) {
+          hArr.push(boxs[i].offsetHeight)
+        } else {
+          let minH = Math.min.apply(null, hArr)
+          let index = this.getMInIndex(hArr, minH)
+          console.log(index)
+          boxs[i].style.position = 'absolute';
+          boxs[i].style.top = minH + 'px';
+          boxs[i].style.left = boxW * index + 'px';
+          hArr[index] += boxs[i].offsetHeight;
+
+        }
+      }
+      console.log(hArr)
+
+    },
+
+    getMInIndex (arr, val) {
+      for (const i in arr) {
+        if (arr[i] == val) {
+          return i
+
+        }
+      }
     }
   },
 
-  created() {
-    // this.imgsArr = this.initImgsArr(0, 10);
+  mounted () {
+    setTimeout(() => { this.initImg() }, 20)
   }
 };
 </script>
